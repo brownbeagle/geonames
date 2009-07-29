@@ -16,10 +16,10 @@ namespace :geonames do
       task "cities#{population}".to_sym => :environment do
         # Download and decompress the files.
         zip_file = "#{RAILS_ROOT}/db/geonames/cities#{population}.zip"
-        # download("http://download.geonames.org/export/dump/cities#{population}.zip", zip_file)
+        download("http://download.geonames.org/export/dump/cities#{population}.zip", zip_file)
         # OSX specific unzip command.
-        # `unzip -o -d #{File.dirname(zip_file)} #{zip_file}`
-        # File.unlink(zip_file)
+        `unzip -o -d #{File.dirname(zip_file)} #{zip_file}`
+        File.unlink(zip_file)
         # Import into the database.
         txt_file = "#{zip_file.split('.').first}.txt"
         File.open(txt_file) do |f|
