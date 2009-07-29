@@ -1,0 +1,36 @@
+= Geonames
+
+Geonames is a Ruby on Rails engine that facilitates easy importing and use of the http://geonames.org source of geographic data.
+
+= Installation
+
+Add the plugin to your Ruby on Rails application.
+
+  ruby script/plugin install git://github.com/brownbeagle/geonames.git
+
+Copy the migrations from the plugin to your application.
+
+  rake geonames:migrate
+  
+Import the data.
+
+  rake geonames:import:all
+
+That's it! Now you have country and city information from http://geonames.org in your application.
+
+= Geoname Classes
+
+  >> GeonamesCountry
+  => GeonamesCountry(id: integer, iso: string, iso3: string, iso_numeric: string, fips: string, country: string, capital: string, area: integer, population: integer, continent: string, tld: string, currency_code: string, currency_name: string, phone: string, postal_code_format: string, postal_code_regex: string, languages: string, geonameid: string, neighbours: string, equivalent_fips_code: string, created_at: datetime, updated_at: datetime)
+
+  >> GeonamesCity
+  => GeonamesCity(id: integer, geonameid: integer, name: string, asciiname: string, alternatenames: string, latitude: float, longitude: float, feature: string, country: string, cc2: string, admin1: string, admin2: string, admin3: string, admin4: string, population: integer, elevation: integer, gtopo30: integer, timezone: string, modification: datetime, created_at: datetime, updated_at: datetime)
+
+If you need more detail have a look at the migration files that were copied over from the plugin in to your db/migrate directory.
+
+= Credits
+
+Geonames is maintained by {Alex Pooley}[mailto:alex@brownbeagle.com.au], and is funded by {Brown Beagle Software}[http://www.brownbeagle.com.au].
+
+= License
+Blog Engine is Copyright (c) 2009 Alex Pooley, Brown Beagle Software. It is free software, and may be redistributed under the terms specified in the MIT-LICENSE file.
