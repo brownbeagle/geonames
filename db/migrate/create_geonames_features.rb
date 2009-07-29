@@ -1,4 +1,4 @@
-class CreateGeonamesCities < ActiveRecord::Migration
+class CreateGeonamesFeatures < ActiveRecord::Migration
 
   # geonameid         : integer id of record in geonames database
   # name              : name of geographical point (utf8) varchar(200)
@@ -20,7 +20,7 @@ class CreateGeonamesCities < ActiveRecord::Migration
   # timezone          : the timezone id (see file timeZone.txt)
   # modification date : date of last modification in yyyy-MM-dd format
   def self.up
-    create_table :geonames_cities do |t|
+    create_table :geonames_features do |t|
       t.integer :geonameid
       t.string :name
       t.string :asciiname
@@ -43,9 +43,20 @@ class CreateGeonamesCities < ActiveRecord::Migration
 
       t.timestamps
     end
+
+    add_index :geonames_features, :name
+    add_index :geonames_features, :country
+    add_index :geonames_features, :population
+    add_index :geonames_features, :admin1
   end
 
   def self.down
-    drop_table :geonames_cities
+    # TODO Do we need to remove index if we remove the table anyway?
+    remove_index :geonames_features, :admin1
+    remove_index :geonames_features, :population
+    remove_index :geonames_features, :country
+    remove_index :geonames_features, :name
+
+    drop_table :geonames_features
   end
 end

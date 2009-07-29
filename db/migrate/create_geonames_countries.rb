@@ -27,9 +27,14 @@ class CreateGeonamesCountries < ActiveRecord::Migration
 
       t.timestamps
     end
+
+    add_index :geonames_countries, :country
   end
 
   def self.down
+    # TODO Do we need to remove index if we remove the table anyway?
+    remove_index :geonames_countries, :country
+
     drop_table :geonames_countries
   end
 end

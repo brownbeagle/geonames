@@ -8,26 +8,59 @@ Add the plugin to your Ruby on Rails application.
 
   ruby script/plugin install git://github.com/brownbeagle/geonames.git
 
+Run the installation rake task.
+
+  rake geonames:install
+  
+Then sit back and wait a while as you migrate your database, download data, and import in to your database.
+
+The geonames:install task won't install the complete set of geonames features because this data set if 170M+. Install the entire feature set using:
+
+  rake geonames:import:features
+  
+It's worth grabbing a coffee or two at this point as the import will take a while to complete.
+
+If you need more fine grained control over the installation process you can run individual geoname rake tasks:
+
+  rake --tasks |grep geonames
+  
+  rake geonames:copy_migrations             # Copy over the migration files and migrate
+  rake geonames:import:admin1               # Import admin1 codes
+  rake geonames:import:all                  # Import all geonames data.
+  rake geonames:import:cities               # Import all cities, regardless of population.
+  rake geonames:import:cities1000           # Import cities with population greater than 1000
+  rake geonames:import:cities15000          # Import cities with population greater than 15000
+  rake geonames:import:cities5000           # Import cities with population greater than 5000
+  rake geonames:import:countries            # Import country information
+  rake geonames:import:features             # Import feature data.
+  rake geonames:install                     # Generate and install migrations, then download and import all data (except for geonames:import:features)
+  rake geonames:migrate                     # Copy over the migration files and migrate
+
 Copy the migrations from the plugin to your application and run the migrations.
 
   rake geonames:migrate
   # rake geonames:copy_migrations if you don't want to run the migrations.
-
-Import the data.
-
-  rake geonames:import:all
-
-That's it! Now you have country and city information from http://geonames.org in your application.
 
 = Geoname Classes
 
   >> GeonamesCountry
   => GeonamesCountry(id: integer, iso: string, iso3: string, iso_numeric: string, fips: string, country: string, capital: string, area: integer, population: integer, continent: string, tld: string, currency_code: string, currency_name: string, phone: string, postal_code_format: string, postal_code_regex: string, languages: string, geonameid: string, neighbours: string, equivalent_fips_code: string, created_at: datetime, updated_at: datetime)
 
-  >> GeonamesCity
-  => GeonamesCity(id: integer, geonameid: integer, name: string, asciiname: string, alternatenames: string, latitude: float, longitude: float, feature: string, country: string, cc2: string, admin1: string, admin2: string, admin3: string, admin4: string, population: integer, elevation: integer, gtopo30: integer, timezone: string, modification: datetime, created_at: datetime, updated_at: datetime)
+  >> GeonamesFeature
+  => GeonamesFeature(id: integer, geonameid: integer, name: string, asciiname: string, alternatenames: string, latitude: float, longitude: float, feature: string, country: string, cc2: string, admin1: string, admin2: string, admin3: string, admin4: string, population: integer, elevation: integer, gtopo30: integer, timezone: string, modification: datetime, created_at: datetime, updated_at: datetime)
+  
+  >> GeonamesAdmin1
+  => GeonamesAdmin1(id: integer, code: string, name: string, created_at: datetime, updated_at: datetime)
 
 If you need more detail have a look at the migration files that were copied over from the plugin in to your db/migrate directory.
+
+Lastly, a collection of indexes have been added to the database for common lookup queries. You may need to add/remove indexes based on the requirements of your application.
+
+= TODO
+
+There still some types of data we're not importing from geonames.
+
+There's more work to be done in defining relationships, data validations, named scopes, and that sort of basic stuff.
 
 = Credits
 
