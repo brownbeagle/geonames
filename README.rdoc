@@ -8,10 +8,11 @@ Add the plugin to your Ruby on Rails application.
 
   ruby script/plugin install git://github.com/brownbeagle/geonames.git
 
-Copy the migrations from the plugin to your application.
+Copy the migrations from the plugin to your application and run the migrations.
 
   rake geonames:migrate
-  
+  # rake geonames:copy_migrations if you don't want to run the migrations.
+
 Import the data.
 
   rake geonames:import:all
