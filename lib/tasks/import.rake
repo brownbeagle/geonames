@@ -18,7 +18,7 @@ namespace :geonames do
     desc 'Import feature data. Beware: 170M+ download required.'
     task :features => [:build_cache, :environment] do
       zip_file = "#{CACHE_DIR}/allCountries.zip"
-      txt_file = "#{zip_file.split('.').first}.txt"
+      txt_file = "#{zip_file[0..-5]}.txt"
       # Download and decompress the files if not already downloaded.
       unless File::exist?(txt_file)
         download("http://download.geonames.org/export/dump/allCountries.zip", zip_file)
@@ -35,7 +35,7 @@ namespace :geonames do
       desc "Import cities with population greater than #{population}"
       task "cities#{population}".to_sym => [:build_cache, :environment] do
         zip_file = "#{CACHE_DIR}/cities#{population}.zip"
-        txt_file = "#{zip_file.split('.').first}.txt"
+        txt_file = "#{zip_file[0..-5]}.txt"
         # Download and decompress the files if not already downloaded.
         unless File::exist?(txt_file)
           download("http://download.geonames.org/export/dump/cities#{population}.zip", zip_file)
