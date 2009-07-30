@@ -25,8 +25,8 @@ namespace :geonames do
     base_time = Time.now
     (plugin_migrations - existing_migrations).each do |new_migration|
       migration_timestamp = base_time.strftime('%Y%m%d%H%M%S')
-      puts "Copying from #{APP_MIGRATION_DIR}/#{new_migration} to #{PLUGIN_MIGRATION_DIR}/#{migration_timestamp}_#{new_migration}"
-      FileUtils::cp "#{APP_MIGRATION_DIR}/#{new_migration}", "#{PLUGIN_MIGRATION_DIR}/#{migration_timestamp}_#{new_migration}"
+      puts "Copying from #{PLUGIN_MIGRATION_DIR}/#{new_migration} to #{APP_MIGRATION_DIR}/#{migration_timestamp}_#{new_migration}"
+      FileUtils::cp "#{PLUGIN_MIGRATION_DIR}/#{new_migration}", "#{APP_MIGRATION_DIR}/#{migration_timestamp}_#{new_migration}"
       base_time+=1
     end
   end
