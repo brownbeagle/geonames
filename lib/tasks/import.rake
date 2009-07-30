@@ -2,15 +2,22 @@ require 'net/http'
 
 namespace :geonames do
   namespace :import do
+    CACHE_DIR = "#{RAILS_ROOT}/db/geonames_cache"
+
+    desc 'Build the geonames download cache directory'
+    task :build_cache do
+      Dir::mkdir(CACHE_DIR) rescue nil
+    end
+
     desc 'Import all geonames data. Should be performed on a clean install.'
-    task :all => [:countries, :cities]
+    task :all => [:build_cache, :countries, :cities]
 
     desc 'Import all cities, regardless of population. Download requires about 5M.'
-    task :cities => [:cities15000, :cities5000, :cities1000]
+    task :cities => [:build_cache, :cities15000, :cities5000, :cities1000]
     
     desc 'Import feature data. Beware: 170M+ download required.'
-    task :features => :environment do
-      zip_file = "#{RAILS_ROOT}/db/geonames/allCountries.zip"
+    task :features => [:build_cache, :environment] do
+      zip_file = "#{CACHE_DIR}/allCountries.zip"
       txt_file = "#{zip_file.split('.').first}.txt"
       # Download and decompress the files if not already downloaded.
       unless File::exist?(txt_file)
@@ -26,8 +33,8 @@ namespace :geonames do
     # geonames:import:citiesNNN where NNN is population size.
     %w[15000 5000 1000].each do |population|
       desc "Import cities with population greater than #{population}"
-      task "cities#{population}".to_sym => :environment do
-        zip_file = "#{RAILS_ROOT}/db/geonames/cities#{population}.zip"
+      task "cities#{population}".to_sym => [:build_cache, :environment] do
+        zip_file = "#{CACHE_DIR}/cities#{population}.zip"
         txt_file = "#{zip_file.split('.').first}.txt"
         # Download and decompress the files if not already downloaded.
         unless File::exist?(txt_file)
@@ -75,8 +82,8 @@ namespace :geonames do
     end
     
     desc 'Import admin1 codes'
-    task :admin1 => :environment do
-      txt_file = "#{RAILS_ROOT}/db/geonames/admin1Codes.txt"
+    task :admin1 => [:build_cache, :environment] do
+      txt_file = "#{CACHE_DIR}/admin1Codes.txt"
       unless File::exist?(txt_file)
         download('http://download.geonames.org/export/dump/admin1Codes.txt', txt_file)
       end
@@ -92,7 +99,6 @@ namespace :geonames do
         end
       end
     end
-
 
     private
 

@@ -1,7 +1,7 @@
 .DS_Store
 db/schema.rb
 db/*.sqlite3
-db/geonames
+db/geonames_cache
 log/*
 tmp
 public/system
