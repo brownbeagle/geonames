@@ -102,7 +102,7 @@ namespace :geonames do
               attributes[col_names[i]] = col_value
             end
           end
-          GeonamesFeature.create(attributes)
+          GeonamesAdmin1.create(attributes)
         end
       end
     end
@@ -129,7 +129,7 @@ namespace :geonames do
               attributes[col_names[i]] = col_value
             end
           end
-          GeonamesFeature.create(attributes)
+          GeonamesAdmin2.create(attributes)
         end
       end
     end
