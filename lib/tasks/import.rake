@@ -83,12 +83,12 @@ namespace :geonames do
     
     desc 'Import admin1 codes'
     task :admin1 => [:build_cache, :environment] do
-      txt_file = "#{CACHE_DIR}/admin1Codes.txt"
+      txt_file = "#{CACHE_DIR}/admin1CodesASCII.txt"
       unless File::exist?(txt_file)
-        download('http://download.geonames.org/export/dump/admin1Codes.txt', txt_file)
+        download('http://download.geonames.org/export/dump/admin1CodesASCII.txt', txt_file)
       end
       File.open(txt_file) do |file|
-        col_names = [:code, :name]
+        col_names = [:code, :name, :asciiname, :geonameid]
         file.each_line do |line|
           attributes = {}
           line.strip.split("\t").each_with_index do |col_value, i|
@@ -97,7 +97,7 @@ namespace :geonames do
             if i == 0
               country, admin1 = col_value.split('.')
               attributes[:country] = country.strip
-              attributes[:admin1] = admin1.strip
+              attributes[:admin1] = admin1.strip rescue nil
             else
               attributes[col_names[i]] = col_value
             end
