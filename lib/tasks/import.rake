@@ -10,7 +10,7 @@ namespace :geonames do
     end
 
     desc 'Import all geonames data. Should be performed on a clean install.'
-    task :all => [:build_cache, :countries, :cities]
+    task :all => [:build_cache, :countries, :cities, :admin1, :admin2]
 
     desc 'Import all cities, regardless of population. Download requires about 5M.'
     task :cities => [:build_cache, :cities15000, :cities5000, :cities1000]
@@ -93,9 +93,43 @@ namespace :geonames do
           attributes = {}
           line.strip.split("\t").each_with_index do |col_value, i|
             col_value.gsub!('(general)', '')
-            attributes[col_names[i]] = col_value.strip
+            col_value.strip!
+            if i == 0
+              country, admin1 = col_value.split('.')
+              attributes[:country] = country.strip
+              attributes[:admin1] = admin1.strip
+            else
+              attributes[col_names[i]] = col_value
+            end
           end
-          GeonamesAdmin1.create(attributes)
+          GeonamesFeature.create(attributes)
+        end
+      end
+    end
+
+    desc 'Import admin2 codes'
+    task :admin2 => [:build_cache, :environment] do
+      txt_file = "#{CACHE_DIR}/admin2Codes.txt"
+      unless File::exist?(txt_file)
+        download('http://download.geonames.org/export/dump/admin2Codes.txt', txt_file)
+      end
+      File.open(txt_file) do |file|
+        col_names = [:code, :name, :asciiname, :geonameid]
+        file.each_line do |line|
+          attributes = {}
+          line.strip.split("\t").each_with_index do |col_value, i|
+            col_value.gsub!('(general)', '')
+            col_value.strip!
+            if i == 0
+              country, admin1, admin2 = col_value.split('.')
+              attributes[:country] = country.strip
+              attributes[:admin1] = admin1.strip
+              attributes[:admin2] = admin2.strip
+            else
+              attributes[col_names[i]] = col_value
+            end
+          end
+          GeonamesFeature.create(attributes)
         end
       end
     end
