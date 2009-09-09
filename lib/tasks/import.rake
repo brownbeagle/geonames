@@ -102,7 +102,7 @@ namespace :geonames do
               attributes[col_names[i]] = col_value
             end
           end
-          GeonamesAdmin1.create(attributes)
+          GeonamesAdmin1.create(attributes) if filter?(attributes)
         end
       end
     end
@@ -129,7 +129,7 @@ namespace :geonames do
               attributes[col_names[i]] = col_value
             end
           end
-          GeonamesAdmin2.create(attributes)
+          GeonamesAdmin2.create(attributes) if filter?(attributes)
         end
       end
     end
@@ -177,10 +177,23 @@ namespace :geonames do
       file_fd.each_line do |line|
         attributes = {}
         line.strip.split("\t").each_with_index do |col_value, i|
-          attributes[col_names[i]] = col_value
+          col = col_names[i]
+          attributes[col] = col_value
         end
-        GeonamesFeature.create(attributes)
+        GeonamesFeature.create(attributes) if filter?(attributes)
       end
+    end
+
+    # Return true when either:
+    #  no filter keys apply.
+    #  all applicable filter keys include the filter value.
+    def filter?(attributes)
+      return attributes.keys.all?{|key| filter_keyvalue?(key, attributes[key])}
+    end
+
+    def filter_keyvalue?(col, col_value)
+      return true unless ENV[col.to_s]
+      return ENV[col.to_s].split('|').include?(col_value.to_s)
     end
 
   end
