@@ -27,7 +27,7 @@ namespace :geonames do
         File.unlink(zip_file)
       end
       # Import into the database.
-      File.open(txt_file) {|f| insert_features(f)}
+      File.open(txt_file) {|f| insert_features(f, GeonamesFeature)}
     end
 
     # geonames:import:citiesNNN where NNN is population size.
@@ -44,7 +44,7 @@ namespace :geonames do
           File.unlink(zip_file)
         end
         # Import into the database.
-        File.open(txt_file) {|f| insert_features(f)}
+        File.open(txt_file) {|f| insert_features(f, GeonamesCity)}
       end
     end
 
@@ -152,7 +152,7 @@ namespace :geonames do
       return res.body
     end
     
-    def insert_features(file_fd)
+    def insert_features(file_fd, klass = GeonamesFeature)
       col_names = [
         :geonameid,
         :name,
@@ -180,7 +180,7 @@ namespace :geonames do
           col = col_names[i]
           attributes[col] = col_value
         end
-        GeonamesFeature.create(attributes) if filter?(attributes)
+        klass.create(attributes) if filter?(attributes)
       end
     end
 

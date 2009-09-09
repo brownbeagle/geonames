@@ -40,6 +40,7 @@ class CreateGeonamesFeatures < ActiveRecord::Migration
       t.integer :gtopo30
       t.string :timezone
       t.timestamp :modification
+      t.string :type
 
       t.timestamps
     end
@@ -48,6 +49,7 @@ class CreateGeonamesFeatures < ActiveRecord::Migration
     add_index :geonames_features, :country
     add_index :geonames_features, :population
     add_index :geonames_features, :admin1
+    add_index :geonames_features, :type
   end
 
   def self.down
