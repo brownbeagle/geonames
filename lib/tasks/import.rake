@@ -15,20 +15,28 @@ namespace :geonames do
     desc 'Import all cities, regardless of population. Download requires about 5M.'
     task :cities => [:build_cache, :cities15000, :cities5000, :cities1000]
     
-    desc 'Import feature data. Specify Country ISO code for just a single country. Beware: 170M+ download required for all countries.'
+    desc 'Import feature data. Specify Country ISO code for just a single country. NOTE: This task can take a long time!'
     task :features => [:build_cache, :environment] do
       download_file = ENV['COUNTRY'].upcase || 'allCountries'
-      zip_file = "#{CACHE_DIR}/#{download_file}.zip"
-      txt_file = "#{zip_file[0..-5]}.txt"
+      zip_filename = download_file+'.zip'
+      zip_file = File.join(CACHE_DIR, zip_filename)
+      txt_file = File.join(CACHE_DIR, download_file+'.txt')
       # Download and decompress the files if not already downloaded.
       unless File::exist?(txt_file)
-        download("http://download.geonames.org/export/dump/#{download_file}", zip_file)
+        download("http://download.geonames.org/export/dump/#{zip_filename}", zip_file)
         # OSX specific unzip command.
         `unzip -o -d #{File.dirname(zip_file)} #{zip_file}`
         File.unlink(zip_file)
       end
       # Import into the database.
-      File.open(txt_file) {|f| insert_features(f, GeonamesFeature)}
+      File.open(txt_file) do |f|
+        VALID_FEATURES = %w[ADMIN1]
+        feature_attrs = VALID_FEATURES & ENV.keys
+        # Filter feature rows according to optional command line params.
+        insert_features(f, GeonamesFeature) do |feature|
+          feature_attrs.all?{|attr| feature[attr.downcase.to_sym] == ENV[attr]}
+        end
+      end
     end
 
     # geonames:import:citiesNNN where NNN is population size.
@@ -153,7 +161,13 @@ namespace :geonames do
       return res.body
     end
     
-    def insert_features(file_fd, klass = GeonamesFeature)
+    # Insert features from a file. Pass a block that returns true/false to include/exclude the feature.
+    def insert_features(file_fd, klass = GeonamesFeature, &block)
+      require 'progressbar'
+      # Setup nice progress output.
+      file_size = file_fd.stat.size
+      progress_bar = ProgressBar.new('Feature Import', file_size)
+
       col_names = [
         :geonameid,
         :name,
@@ -181,7 +195,10 @@ namespace :geonames do
           col = col_names[i]
           attributes[col] = col_value
         end
-        klass.create(attributes) if filter?(attributes)
+        klass.create(attributes) if filter?(attributes) && (block && block.call(attributes))
+
+        # w00t! Friendly output FTW!
+        progress_bar.set(file_fd.pos)
       end
     end
 
