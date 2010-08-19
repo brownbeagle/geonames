@@ -15,13 +15,14 @@ namespace :geonames do
     desc 'Import all cities, regardless of population. Download requires about 5M.'
     task :cities => [:build_cache, :cities15000, :cities5000, :cities1000]
     
-    desc 'Import feature data. Beware: 170M+ download required.'
+    desc 'Import feature data. Specify Country ISO code for just a single country. Beware: 170M+ download required for all countries.'
     task :features => [:build_cache, :environment] do
-      zip_file = "#{CACHE_DIR}/allCountries.zip"
+      download_file = ENV['COUNTRY'].upcase || 'allCountries'
+      zip_file = "#{CACHE_DIR}/#{download_file}.zip"
       txt_file = "#{zip_file[0..-5]}.txt"
       # Download and decompress the files if not already downloaded.
       unless File::exist?(txt_file)
-        download("http://download.geonames.org/export/dump/allCountries.zip", zip_file)
+        download("http://download.geonames.org/export/dump/#{download_file}", zip_file)
         # OSX specific unzip command.
         `unzip -o -d #{File.dirname(zip_file)} #{zip_file}`
         File.unlink(zip_file)
