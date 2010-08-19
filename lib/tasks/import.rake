@@ -163,8 +163,8 @@ namespace :geonames do
     
     # Insert features from a file. Pass a block that returns true/false to include/exclude the feature.
     def insert_features(file_fd, klass = GeonamesFeature, &block)
-      require 'progressbar'
       # Setup nice progress output.
+      require File.join(File.dirname(__FILE__), '../../vendor/plugins/ruby-progressbar/lib/progressbar')
       file_size = file_fd.stat.size
       progress_bar = ProgressBar.new('Feature Import', file_size)
 
