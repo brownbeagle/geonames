@@ -17,7 +17,7 @@ namespace :geonames do
     
     desc 'Import feature data. Specify Country ISO code for just a single country. NOTE: This task can take a long time!'
     task :features => [:build_cache, :environment] do
-      download_file = ENV['COUNTRY'].upcase || 'allCountries'
+      download_file = ENV['COUNTRY'].present? && ENV['COUNTRY'].upcase || 'allCountries'
       zip_filename = download_file+'.zip'
       zip_file = File.join(CACHE_DIR, zip_filename)
       txt_file = File.join(CACHE_DIR, download_file+'.txt')
@@ -175,7 +175,7 @@ namespace :geonames do
         :alternatenames,
         :latitude,
         :longitude,
-        :feature,
+        :feature_class,
         :feature,
         :country,
         :cc2,
@@ -194,6 +194,10 @@ namespace :geonames do
         line.strip.split("\t").each_with_index do |col_value, i|
           col = col_names[i]
           attributes[col] = col_value
+        end
+        
+        if (attributes[:feature] == "PPL")
+          klass = GeonamesCity
         end
         klass.create(attributes) if filter?(attributes) && (block && block.call(attributes))
 

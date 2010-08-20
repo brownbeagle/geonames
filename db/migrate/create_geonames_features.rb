@@ -27,7 +27,7 @@ class CreateGeonamesFeatures < ActiveRecord::Migration
       t.string :alternatenames
       t.float :latitude
       t.float :longitude
-      t.string :feature
+      t.string :feature_class
       t.string :feature
       t.string :country
       t.string :cc2
