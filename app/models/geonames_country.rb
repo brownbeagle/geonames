@@ -1,2 +1,2 @@
-class GeonamesCountry < GeonamesFeature
+class GeonamesCountry < ActiveRecord::Base
 end
